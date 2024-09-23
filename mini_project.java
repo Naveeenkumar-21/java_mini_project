@@ -17,6 +17,7 @@ public class CashFlowMinimizer extends Frame implements ActionListener {
     double totalIncome = 0; // Total incoming money
     double totalExpenses = 0; // Total outgoing money
     String currentUser; // Tracks the current user
+	private TextArea summaryTextArea;
 
     // User class
     static class User {
@@ -262,7 +263,6 @@ public class CashFlowMinimizer extends Frame implements ActionListener {
         return panel;
     }
 
-    // Summary page for the detailed report
     private Panel createSummaryPanel() {
         Panel panel = new Panel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -270,12 +270,7 @@ public class CashFlowMinimizer extends Frame implements ActionListener {
         Label summaryLabel = new Label("Summary of Transactions:");
         TextArea summaryTextArea = new TextArea(10, 30);
 
-        summaryTextArea.setText(
-            "Net Cash Flow: $" + netCashFlow + "\n" +
-            "Total Income: $" + totalIncome + "\n" +
-            "Total Expenses: $" + totalExpenses
-        );
-
+        // Back to home button
         Button backButton = new Button("Back to Home");
         backButton.addActionListener(e -> cardLayout.show(mainPanel, "Home"));
 
@@ -286,10 +281,27 @@ public class CashFlowMinimizer extends Frame implements ActionListener {
         gbc.gridx = 0; gbc.gridy = 1; panel.add(summaryTextArea, gbc);
         gbc.gridx = 0; gbc.gridy = 2; panel.add(backButton, gbc);
 
+        // Method to dynamically update the summary
+        summaryButton.addActionListener(e -> {
+            updateSummaryText(summaryTextArea); // Refresh the summary text
+            cardLayout.show(mainPanel, "Summary");
+        });
+
         return panel;
     }
 
-    // Method to handle button actions
+    // Method to update the summary text with current values
+    private void updateSummaryText(TextArea summaryTextArea) {
+        StringBuilder summary = new StringBuilder();
+        summary.append("Net Cash Flow: $").append(netCashFlow).append("\n")
+               .append("Total Income: $").append(totalIncome).append("\n")
+               .append("Total Expenses: $").append(totalExpenses).append("\n");
+
+        // You can add more detailed transactions if required
+        summaryTextArea.setText(summary.toString());
+    }
+
+
     public void actionPerformed(ActionEvent ae) {
         String command = ae.getActionCommand();
         if (command.equals("Sign Up")) {
@@ -316,8 +328,12 @@ public class CashFlowMinimizer extends Frame implements ActionListener {
             cardLayout.show(mainPanel, "Income");
         } else if (command.equals("Loans")) {
             cardLayout.show(mainPanel, "Loans");
+        } else if (command.equals("View Summary")) {
+            updateSummaryText(summaryTextArea);  // Call this to update summary
+            cardLayout.show(mainPanel, "Summary");
         }
     }
+
 
     private void checkIncomeLimit() {
         if (totalExpenses > totalIncome) {
